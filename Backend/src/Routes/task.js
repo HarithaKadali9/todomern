@@ -18,7 +18,6 @@ taskRouter.post("/createtask", async(req, res)=>{
     res.status(500).json({message: "Internal server error", error: error.message,})
   }
 })
-
 taskRouter.get("/gettasks", async(req, res)=>{
   try{
     const tasks=await Task.find();
@@ -28,36 +27,38 @@ taskRouter.get("/gettasks", async(req, res)=>{
   }
 })
 
-taskRouter.get("/getstatustasks/:status", async(req, res)=>{
+taskRouter.get("/gettask/:id", async(req, res)=>{
   try{
-    const {status}=req.params;
-    const updatestatus=status.toLowerCase();
-    const tasks=await Task.find({status});
-    res.status(200).json({message: "Finding task by status", data: tasks});
+    const {id}=req.params;
+    const task=await Task.findById(id);
+    res.status(200).json({message: "Finding task by status", data: task});
   }catch(error){
-    res.status(500).json({message: "Internal server error", data: tasks})
+    res.status(500).json({message: "Internal server error", error: error.message})
   }
 })
-taskRouter.patch("/updatetask/:title", async(req, res)=>{
+taskRouter.patch("/updatetask/:id", async(req, res)=>{
   try{
+    const {id}=req.params;
     const {title, description, status}=req.body;
-    const task=await Task.findOne({title});
+    const task=await Task.findById(id);
     if(!task){
       return res.status(404).json({message: "No such task available", title: title});
     }
-    const updatetask=await Task.updateOne({title, description, status})
-    res.status(200).json({message: "Updated task", data: updatetask});
+    const updatetask=await Task.findByIdAndUpdate(id, {title, description, status});
+     const task1=await Task.findById(id);
+    res.status(200).json({message: "Updated task", data: task1});
   }catch(error){
     res.status(500).json({message: "Internal server error", err: error.message})
   }
 })
-taskRouter.delete("/deletetask/:title", async(req, res)=>{
+taskRouter.delete("/deletetask/:id", async(req, res)=>{
   try{
-    const {title}=req.params;
-    const task=await Task.findOne({title});
-  const deletetask=await Task.deleteOne({title});
-  res.status(200).json({message: "deleted task", task: task})
+    const { id }=req.params;
+    
+  await Task.findByIdAndDelete(id);
+  res.status(200).json({message: "deleted task", id : id})
   }catch(error){
+    console.log("unable to delete task", error.message);
     res.status(500).json({message: "unable to delete task", err: error.message});
   }
   

@@ -7,7 +7,7 @@ import Crud from './components/Crud';
 
 const App = () => {
   return (
-      <Router>
+      <Router className="min-h-screen">
         <NavBar/>
         <Routes>
           
